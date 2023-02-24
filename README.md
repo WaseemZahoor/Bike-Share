@@ -1,4 +1,4 @@
-# Data_Analytics_CaseStudy
+# Data Analytics CaseStudy
 
 **Case Study: How Does a Bike-Share Navigate Speedy Success?**
 
