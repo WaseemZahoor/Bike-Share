@@ -38,7 +38,7 @@ The codebase contains three files:
 1) An R file where the actual analysis and visualizations took place in R programming language (along with comments)
 2) An RMarkdown file where the whole description of the case study is noted down in points. Each step in the analysis is clearly explained here. It also contains the code chunks
 from the above file.
-3) An HTML file which renders the content in the above RMarkdown file along with the code chunks.
+3) A Jupyter file which renders the content in the above RMarkdown file along with the code chunks.
 
 
 **Dataset**
