@@ -1,10 +1,18 @@
 ---
 title: "How Does a Bike-Share Navigate Speedy Success?"
 author: "Waseem Zahoor"
-output: html_document
-output: pdf
-date: '2022-06-03'
+date: 24/02/2023
+output:
+  html_document:
+    theme: darkly
+    toc: true
+    toc_float: true
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
 
 # Scenario
 
@@ -82,34 +90,26 @@ c)  Used `duplicated()` to check for any duplicates present.
 
 **5) Have you documented your cleaning process so you can review and share those results?** Yes, please find the below comments and snippets for the documentation.
 
-install and load all the required packages.
+1. Install and load all the required packages.
 
-1.  <div>
 
-    ```{r}
-    install.packages("tidyverse")
-    install.packages("lubridate")
-    install.packages("ggplot2")
-    install.packages("janitor")
-    install.packages("scales")
-    install.packages("dplyr")
-    ```
+```{r }
+   # Install required packages
+install.packages(c("tidyverse", "lubridate", "ggplot2", "janitor", "scales", "dplyr"))
+   
+```
     
-    ```{r}
+    
+```{r }
     library("dplyr")
     library("tidyverse")
     library("lubridate")
     library("ggplot2")
     library("janitor")
     library("scales")
-
-    rm(list = ls())
-    
-    ```
-
-    </div>
-
-    ```{r}
+```
+ Loading all the csv files of last 12 months
+```{r}
 
     df1 <- read.csv("./data_set/202004-divvy-tripdata.csv")
     df2 <- read.csv("./data_set/202005-divvy-tripdata.csv")
@@ -123,21 +123,21 @@ install and load all the required packages.
     df10 <- read.csv("./data_set/202101-divvy-tripdata.csv")
     df11 <- read.csv("./data_set/202102-divvy-tripdata.csv")
     df12 <- read.csv("./data_set/202103-divvy-tripdata.csv")
-    ```
-
-    ```{r}
-    bike_rides <- rbind(df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, df12)
+```
+ Concatenating all the CSVs into a single dataframe
+```{r}
+bike_rides <- rbind(df1, df2, df3, df4, df5, df6, df7, df8, df9, df10, df11, df12)
     
-    ```
+```
 
-2)  Removing any empty rows or columns present and checking for missing values (Check the missing values for each variable)
+2) Removing any empty rows or columns present and checking for missing values (Check the missing values for each variable)
 
 ```{r}
 new_binded_df <- remove_empty(bike_rides, which=c("rows", "cols"))
 count(filter(new_binded_df, start_station_name==''),start_station_name, member_casual,sort=TRUE)
 ```
 
-3)  count() returns unique values of the variable passed.
+3) count() returns unique values of the variable passed.
 
 ```{r}
 bike_rides %>% 
@@ -169,10 +169,13 @@ Also I created new features using the existing ones. Check them below:
 **a) riding_time**
 
 ```{r}
-clean_df <- new_binded_df_no_dups
-clean_df <- clean_df %>% 
-  mutate(riding_time = as.numeric(ended_at-started_at)/60)
-clean_df
+library(dplyr)
+
+clean_df <- new_binded_df_no_dups %>%
+  mutate(started_at = as.POSIXct(started_at, format = "%Y-%m-%d %H:%M:%S"),
+         ended_at = as.POSIXct(ended_at, format = "%Y-%m-%d %H:%M:%S"),
+         riding_time = as.numeric(ended_at - started_at)/60)
+
 ```
 
 **b) year_month**
@@ -206,6 +209,7 @@ clean_df
 clean_df <- clean_df %>% 
   mutate(start_hour=strftime(clean_df$ended_at, format = "%H",tz = "UTC"))
 clean_df
+head(clean_df, 10)
 ```
 
 **2) Has your data been properly formatted?**
@@ -230,7 +234,7 @@ df %>%
             percentage_of_total=(length(ride_id)/nrow(df))*100)
 ```
 
-From above, it is known that 58% of the total riders in the last 12 months were annual members. The remaining(42%) are casual riders.
+From above, it is known that 59% of the total riders in the last 12 months were annual members. The remaining(41%) are casual riders.
 
 Let's plot the above table.
 
@@ -239,6 +243,7 @@ ggplot(df, aes(member_casual, fill=member_casual))+
   geom_bar()+
   labs(title="Chart-1 Member vs Casual distribution")+
   scale_y_continuous(labels=comma)
+
 ```
 
 **b) Let's check what percent of annual and casual riders ride every month**
@@ -264,6 +269,7 @@ ggplot(df, aes(year_month, fill=member_casual))+
   geom_bar()+
   coord_flip()+
   scale_y_continuous(labels=comma)
+
 ```
 
 **c) Let's now check how riders ride in each hour of the day. Also, later we'll check how this varies per each day of the week**
@@ -296,9 +302,10 @@ Now let's plot the same comparison for each day of the week.
 ```{r}
 ggplot(df, aes(start_hour, fill=member_casual))+
   geom_bar()+
-  facet_wrap(~weekday)+  
+  facet_wrap(~weekday)+
   scale_y_continuous(labels=comma)+
   theme(axis.text.x = element_text(size=6, angle=45))
+
 
 ```
 
@@ -374,7 +381,7 @@ df %>%
 
 It seems docked bikes are more preferred over classic and electric bikes. However, riders have also chosen classic and electric too. Maybe the company has more docked bikes.
 
-Let's plot the above table but we'll also how this trend works for each day.
+Let's plot the above table but we'll also see how this trend works for each day.
 
 ```{r}
 ggplot(df, aes(rideable_type, fill=member_casual))+
@@ -483,7 +490,7 @@ As the number of riders in the winter months was less, the same reflects in the 
 
 According to the above analysis, let's see how members and casual riders differ:
 
-1)  The population of the annual members is more than the casual riders, with 58% of the total riders in the last 12 months.
+1)  The population of the annual members is more than the casual riders, with 59% of the total riders in the last 12 months.
 
 2)  The percentage of riders that own a bike is highest in July, August, and September. We can assume this rise due to the season (Summer to Fall transition)
 
